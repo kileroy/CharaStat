@@ -1,0 +1,79 @@
+{
+    "169586520989106176": {
+        "droit": {
+            "add": true,
+            "supp": true,
+            "token": true
+        },
+        "perso": {
+            "test": {
+                "sexe": "Homme",
+                "orientation": "aux Hommes",
+                "role": "élève",
+                "fiche": "ici"
+            },
+            "deux": {
+                "sexe": "Homme",
+                "orientation": "aux Hommes",
+                "role": "autre",
+                "fiche": "ici"
+            },
+            "trois": {
+                "sexe": "Femme",
+                "orientation": "aux Hommes",
+                "role": "autre",
+                "fiche": "ici"
+            },
+            "quatre": {
+                "sexe": "Femme",
+                "orientation": "aux Deux",
+                "role": "élève",
+                "fiche": "ici"
+            }
+        }
+    },
+    "1362179563538612335": {
+        "perso": {
+            "bot1": {
+                "sexe": "Femme",
+                "orientation": "aux Deux",
+                "role": "élève",
+                "fiche": "oui"
+            },
+            "bot2": {
+                "sexe": "Femme",
+                "orientation": "aux Deux",
+                "role": "élève",
+                "fiche": "oui"
+            },
+            "bot3": {
+                "sexe": "Femme",
+                "orientation": "aux Hommes",
+                "role": "personnel",
+                "fiche": "oui"
+            }
+        }
+    }
+	"1": {
+        "perso": {
+            "bot1": {
+                "sexe": "Femme",
+                "orientation": "aux Deux",
+                "role": "élève",
+                "fiche": "oui"
+            },
+            "bot2": {
+                "sexe": "Femme",
+                "orientation": "aux Deux",
+                "role": "élève",
+                "fiche": "oui"
+            },
+            "bot3": {
+                "sexe": "Femme",
+                "orientation": "aux Hommes",
+                "role": "personnel",
+                "fiche": "oui"
+            }
+        }
+    }
+}

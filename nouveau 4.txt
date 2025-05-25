@@ -1,0 +1,30 @@
+Nombre aprocimatif travailler dessus : 8 - 4 -
+
+A faire
+
+- Gestion des Token, voir, ajout, supprime etc
+-Gestion de magasin avec les token
+-Gestion de 'Caractère' du user pour intéraction
+x-Donner la liste des perso du user, juste nom ou en détail, genre : Posède ; Un élève nomé 'x' attiré par les h/f/les deux/tout
+-	avec posibilité de juste demander ceux d'un sexe, et/ou ceux d'un role
+-Donner un perso au hazard de la personne
+
+-"Marquer" les user qui passe, et si un 'revien', le mentioné
+
+x-Vérification des droit des user pour certaine commande
+x-Ajouter un perso en donner le id / @user et non que pour soi
+
+-Faire un log dans un chanelle ou le bot dit qui tente de faire quoi?
+-M'amuser a mettre une black list
+
+x-l'ajout et sup soit qu'au personne de droit, pour que le message d'ajout sois le message de valid
+-Gérer le /stat pour que si une personne n'as que des perso d'un sex, pas faire : Possède 4 perso, dont 4 femme
+
+-Faire que les membre peuvent mettre en "favori" un perso des autre membre
+-Et pouvoir dire qui est le perso qui a la plus de "hype" du serveur
+
+x-Faire qu'à l'ajout dun personnage, le user se vois donner le role discord -s'il la pas déjà- (Combiner avev le fait de l'utiliser a un message de validation...)
+
+-Mettre la pagination visible sur la "liste" (1/3) etc
+
+-Commande pour répondre vite faite a la question "Est-ce actif ici?"
