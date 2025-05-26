@@ -1,7 +1,9 @@
 import discord
 import json
 import asyncio
+import os
 
+from dotenv import load_dotenv
 from typing import Optional
 from typing import Literal
 from collections import defaultdict
@@ -12,8 +14,9 @@ from discord.app_commands import Choice
 from discord.ext import commands
 from discord.ui import View, Button
 
-
 # Variable globale
+load_dotenv()  # Charge les variables du fichier .env
+TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 user_stats = {}
 fichier = {}
 
@@ -223,7 +226,7 @@ async def clean_update(interaction: discord.Interaction):
     stats = load_json(interaction.guild.id)
         
     #Save du fichier juste au cas (Mettre dnas une fonction a part?)
-    now = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")  # Ex: 2025-05-25 14:53:00
+    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Ex: 2025-05-25 14:53:00
     fichier = f"Stat-{interaction.guild.id}-Backup-{now}.json"
     with open(f"Stats/{fichier}", "w", encoding="utf-8") as f:
         json.dump(stats, f, ensure_ascii=False, indent=4)    
@@ -250,11 +253,23 @@ async def clean_update(interaction: discord.Interaction):
     await message(interaction, mess)
 
     ##Edit du message d'information des stat du serveur   
-    # message_id = 1363638934164213791  # L’ID du message à éditer
-    # channel = bot.get_channel(842239972864950273)  # L’ID du salon où le message a été posté
-    # message = await channel.fetch_message(message_id)
-    # await message.edit(content="Message de /stats_serveur.")
-
+    #message_id = 1363638934164213791  # L’ID du message à éditer
+    message_id = int(1376356880271671369)  # Debug
+    #channel = bot.get_channel(842239972864950273)  # L’ID du salon où le message a été posté
+    channel = bot.get_channel(1376353412832301137)  # Debug
+    message_stats = message_stat_serveur(interaction, stats)
+    
+    try:
+        edit_post = await channel.fetch_message(message_id)
+        await edit_post.edit(content=message_stats)
+        print("Message de stat du serveur Édité")
+    except discord.NotFound:
+        # Si le message n'existe plus ou pas, on en crée un nouveau
+        print(f"⚠️ Message (id:{message_id}) introuvable, création d’un nouveau.")
+        await channel.send(message_stats)
+    except Exception as e:
+        print(f"❌ Une autre erreur est survenue : {type(e).__name__} - {e}")
+    
     save_json(stats, interaction.guild.id)
 
 @bot.tree.command(name="liste", description="Liste des personnages.")
@@ -303,7 +318,6 @@ async def liste_persos(
     else:
         await message(interaction, f"Aucun personnage trouvé.")
 
-
 @bot.tree.command(name="stats", description="Donne ses statistique.")
 @app_commands.guilds(
     discord.Object(id=666059235070574593),  # ID de ton serveur 1
@@ -347,75 +361,19 @@ async def stats_persos(
         
     await message(interaction, text)
     
-@bot.tree.command(name="stats_serveur", description="Donne les statistiques du serveur.")
-@app_commands.guilds(
-    discord.Object(id=666059235070574593),  # ID de ton serveur 1
-    discord.Object(id=1362186859819565266)   # ID de ton serveur 2
-)
-@app_commands.describe(
-    étendu="Plus en détail, avec fiche, rôle etc?"
-)
-async def stats_serveur(
-    interaction: discord.Interaction,
-    étendu: Optional[Literal["oui", "non"]] = "oui"
-):
-    print(f"{interaction.user.display_name} sort les stat du serveur.")
-    await interaction.response.defer()  # Signale que la commande est en traitement
-    ##
-    
-    stat_nb_perso = 0
-    stats_perso = {
-        "sexe": defaultdict(int),
-        "orientation": defaultdict(lambda: defaultdict(int)),
-        "role": defaultdict(int)
-    }
-
-    txt_sexe = ""
-    txt_orientation = ""
-    stats_json = load_json(interaction.guild.id)
-    for user in stats_json:
-        user_id = str(user)
-        stats_perso = get_stats(interaction, user_id, stats_perso)
-    
-    #affiche les stat
-    for sexe, nb in stats_perso["sexe"].items():
-        stat_nb_perso += nb
-        txt_sexe += f"{nb} {sexe}\n"
-        for orientation, ori_nb in stats_perso["orientation"].get(sexe).items():
-            txt_orientation += f"{ori_nb} **{sexe}{'s' if ori_nb > 1 else ''}** {'est' if ori_nb == 1 else 'sont'} attiré{'e' if sexe == 'femme' else ''}s par les **{orientation if orientation != 'tout' else 'deux'}**\n"
-    
-    text = f"Il y a {stat_nb_perso} personnes dans la Ero dont\n\n"+ txt_sexe +"\n"+ txt_orientation +"\n"
-    
-    for role, nb in stats_perso["role"].items():
-        text += f"{nb} sont {'du' if role == 'personnel' else 'des'} **{role if role != 'autre' else 'habitant(e)'}s** {'de la Ero' if role != 'élève' else ''}\n"
-        
-    await message(interaction, text)
-
-#A checker si je fais pas juste une commande "Update"
-@bot.event
-async def on_member_remove(member):
-    user_id = member.id
-    guild_id = member.guild.id
-    stats = load_json(guild_id)
-
-    if user_id in stats:
-        print(f"👋 {member.display_name} nous a quitté.") #l'afficher sur le serveur... Meuuuhh...
-        del stats[user_id]
-        save_json(stats, guild_id)
-
 #
 ####Intéraction####
 #
 
 #Perver up
 @bot.tree.command(name="pelotte", description="Pelotter l'archiviste")
-async def ping(interaction: discord.Interaction):
+async def action_pelotte(interaction: discord.Interaction):
     await message(interaction, f"**Se fait pelloter par {interaction.user.display_name}**")
     await message(interaction, f"<:MatsumiSuperShy:1119386825644068945>")
 
 #Cute up
 @bot.tree.command(name="calin", description="Calîner l'archiviste")
-async def ping(interaction: discord.Interaction):
+async def action_calin(interaction: discord.Interaction):
     await message(interaction, f"**Se fait calîner par {interaction.user.display_name}**")
     await message(interaction, f"<:MidnaSmile:1103736201061613658>")
        
@@ -465,9 +423,34 @@ async def verif_droit(interaction, stats, action):
         return False
     return True
 
-# def get_server_stats(interaction: discord.Interaction) -> dict:
-    # guild_id = interaction.guild.id
-    # return user_stats.setdefault(guild_id, {})
+def message_stat_serveur(interaction, stats_json): 
+    stat_nb_perso = 0
+    stats_perso = {
+        "sexe": defaultdict(int),
+        "orientation": defaultdict(lambda: defaultdict(int)),
+        "role": defaultdict(int)
+    }
+
+    txt_sexe = ""
+    txt_orientation = ""
+    #stats_json = load_json(interaction.guild.id)
+    for user in stats_json:
+        user_id = str(user)
+        stats_perso = get_stats(interaction, user_id, stats_perso)
+    
+    #affichage des stats
+    for sexe, nb in stats_perso["sexe"].items():
+        stat_nb_perso += nb
+        txt_sexe += f"{nb} {sexe}\n"
+        for orientation, ori_nb in stats_perso["orientation"].get(sexe).items():
+            txt_orientation += f"{ori_nb} **{sexe}{'s' if ori_nb > 1 else ''}** {'est' if ori_nb == 1 else 'sont'} attiré{'e' if sexe == 'femme' else ''}s par les **{orientation if orientation != 'tout' else 'deux'}**\n"
+    
+    text = f"Il y a {stat_nb_perso} personnes dans la Ero dont\n\n"+ txt_sexe +"\n"+ txt_orientation +"\n"
+    
+    for role, nb in stats_perso["role"].items():
+        text += f"{nb} sont {'du' if role == 'personnel' else 'des'} **{role if role != 'autre' else 'habitant(e)'}s** {'de la Ero' if role != 'élève' else ''}\n"
+        
+    return text
 
 def get_stats(interaction, user_id, stats_perso):
     #print(f"Calcule des stat de {user_id}")
@@ -516,7 +499,7 @@ async def delete_all(interaction: discord.Interaction):
     
     global user_stats
     stats = load_json(interaction.guild.id)
-    now = datetime.now().strftime("%Y-%m-%d-%H:%M:%S")  # Ex: 2025-05-25 14:53:00
+    now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Ex: 2025-05-25 14:53:00
 
     fichier = f"Stat-{interaction.guild.id}-Backup-{now}.json"
     with open(f"Stats/{fichier}", "w", encoding="utf-8") as f:
@@ -529,7 +512,7 @@ async def delete_all(interaction: discord.Interaction):
 @bot.tree.command(name="logout", description="Donner congé à l'archiviste.")
 async def logout(interaction: discord.Interaction):
     if interaction.user.id != 169586520989106176:
-        await message(interaction, "J'ai, j'ai encore du travaille à faire. Je ne partirai pas tout de suite... <:RozaHigh:1103796416373080084>")
+        await message(interaction, "J'ai-j'ai encore du travaille à faire. Je ne partirai pas tout de suite... <:RozaHigh:1103796416373080084>")
         return
     await message(interaction, "Merci pour ton travaille. À la prochaine.")
     await bot.close()  # Cette méthode ferme proprement le bot
@@ -617,4 +600,4 @@ class PaginationView(View):
         return True
 
 # Remplace TON_TOKEN_ICI par ton token (garde-le secret !)
-bot.run("secret")
+bot.run(TOKEN)
